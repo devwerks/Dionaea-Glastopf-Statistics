@@ -41,10 +41,15 @@ def generateGraphs():
         #
         #
 
-        #Most attacked ports
+        #Most attacked ports - Dionaea
         querySQL = 'SELECT COUNT(local_port) AS hitcount,local_port AS port FROM connections WHERE connection_type = "accept" GROUP BY local_port HAVING COUNT(local_port) > 10'
         print querySQL
         c.execute(querySQL)
+        
+        #Count attacks on port 80 - Glastopf
+        querySQL = "SELECT COUNT(request_url) AS hitcount,'80 - http' AS port FROM events"
+        print querySQL
+        x.execute(querySQL)
         
         chart = PieChart2D(pieChartWidth, pieChartHeight, colours=pieColours)
         
@@ -55,7 +60,20 @@ def generateGraphs():
 		print(row)
                 flist.append(row[0])
                 seclist.append(str(row[1]))
-                
+
+        for row in x:
+                print(row)
+                flist.append(row[0])
+                seclist.append(str(row[1]))      
+                  
+        seclist = [port.replace('21','21 - ftp') for port in seclist]
+        seclist = [port.replace('42','42 - wins') for port in seclist]
+        seclist = [port.replace('135','135 - msrpc') for port in seclist]
+        seclist = [port.replace('445','445 - smb') for port in seclist]
+        seclist = [port.replace('1433','1433 - ms-sql') for port in seclist]
+        seclist = [port.replace('3306','3306 - mysql') for port in seclist]
+        seclist = [port.replace('5060','5060 - sip') for port in seclist]
+
         chart.add_data(flist)
         chart.set_legend(seclist)
 
@@ -188,8 +206,9 @@ def generateGraphs():
         chart.download('popular_inurl.png')
 
 def version():
-	sys.stdout.write("\nHoneypot Statistics 0.2\n")
-	sys.stdout.write("Author: Johannes Schroeter - www.devwerks.net\n\n")
+	sys.stdout.write("\nHoneypot Statistics 0.3\n")
+	sys.stdout.write("Basic Python script for generating Graphs of your Honeypot using the pygooglechart wrapper\n")
+        sys.stdout.write("Author: Johannes Schroeter - www.devwerks.net\n\n")
 
 def main():
         generateGraphs()
