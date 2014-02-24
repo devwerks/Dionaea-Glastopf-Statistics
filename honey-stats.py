@@ -186,7 +186,7 @@ def generateGraphs():
         chart.download('popular_intitle.png')
         
         #Top10 inurl requests
-        querySQL = 'SELECT count, content FROM inurl ORDER BY count DESC LIMIT 10'
+        querySQL = 'SELECT count, SUBSTR(content,0,40) FROM inurl ORDER BY count DESC LIMIT 10'
         print querySQL
         x.execute(querySQL)
         
